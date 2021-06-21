@@ -12,3 +12,6 @@ NinjaInfo
 1. python3 installed
 2. to use this tool use sudo or run this as root user for tasks like OS Detection and traceroute.
 3. install some modules mentioned in requirements-dev.txt
+
+you can install them by typing :- 
+pip install requirements-dev.txt
