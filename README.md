@@ -3,7 +3,7 @@ This tool will try to gather as much information as possible. Bascially , this g
 
 # who can use this tool ?
 This tool is made for OSINT Investigetors and some penetration testers. As this tool gathers some useful information as well , so it seems that this 
-tool will help them a lot.
+tool will help them a lot. Generally, this tool will help penetration testers in information gathering phase.
 
 # tool
 NinjaInfo
