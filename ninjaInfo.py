@@ -1,159 +1,127 @@
 #!/usr/bin/python3
-import os
-import platform
-import sys
-import time
-import requests
-import socket
-from icmplib import traceroute
-import nmap
+from requests import get
+from socket import gethostbyname
+from pyfiglet import figlet_format
+from sys import argv
+from hashlib import md5
+import argparse
 
-if platform.system() == 'Linux':
-	os.system('clear')
+parser = argparse.ArgumentParser(
+	description="NinjaInfo, a OSINT tool which can be used by every OSINT investigators.",
+	epilog="Example - %(prog)s --geolocate-ip 49.37.64.197 --scrap-mail https://www.google.com"
+)
+parser.add_argument(
+		"--geolocate-ip", 
+		help="Geolocate by IPv4 public address given by user", 
+		dest="ip_address", 
+		nargs=1
+		)
+parser.add_argument(
+		"--geolocate-phone",
+		help="Geolocate by Phone Number given by user (e.g. : python3 %(prog)s --geolocate-phone +917209839773 )",
+		dest="phone_number",
+		nargs=1
+		)
+parser.add_argument(
+		"--scrap-mail", 
+		help="Only use it for scraping mail from a website or platform.", 
+		dest="scrap_mail", 
+		nargs=1
+		)
+parser.add_argument(
+		"--getby-favicon",
+		help="Do tell the framework used by the website by just using the favicon.ico's path.",
+		dest="favicon",
+		nargs=1
+		)
+parser.add_argument(
+		"--version",
+		help="print version",
+		action="version",
+		version="%(prog)s 1.0",
+)
 
-if platform.system() == 'Windows' or platform.system() == 'windows':
-	os.system('cls')
+argument = parser.parse_args()
 
-print("""
-          _             _           ___            __         
-  _ __   (_)  _ __     (_)   __ _  |_ _|  _ __    / _|   ___  
- | '_ \\  | | | '_ \\    | |  / _` |  | |  | '_ \\  | |_   / _ \\ 
- | | | | | | | | | |   | | | (_| |  | |  | | | | |  _| | (_) |
- |_| |_| |_| |_| |_|  _/ |  \\__,_| |___| |_| |_| |_|    \\___/ 
-                     |__/                                     
-""")
-print('-'*72)
-def usage():
-	print("USAGE : sudo python3 ninjaInfo.py <IP>")
+try:
+	from phonenumbers import geocoder, parse, timezone, carrier
+except Exception as e:
+	print(e)
+	exit(0)
 
-if len(sys.argv) != 2:
-	usage()	
+if len(argv) == 1:
+	parser.print_help()
+	exit(0)
 
-def geolocate_osint(target_ip):
-	print("[*] doing this task with both port scanning and traceroute on target %s" % (target_ip))
-	
+print(figlet_format("NinjaInfo"))
+print("\t"*3 + "-by whoamiPwns\n")
+
+def parsePhonedo(number):
+	flag = 0
+	phoneNumber = parse(number)
+	if phoneNumber:
+		print(f"\n\033[1;34m[\033[1;36m+\033[1;34m]\033[0m {phoneNumber}")
+		location = geocoder.description_for_number(phoneNumber, lang="en")
+		service_provider = carrier.name_for_number(phoneNumber, lang="en")
+		TimeZone = timezone._country_level_time_zones_for_number(phoneNumber)
+		if location:
+			print(f"\033[1;34m[\033[1;36m+\033[1;34m]\033[0m Location for Phone Number : {location}")
+			if service_provider:
+				print(f"\033[1;34m[\033[1;36m+\033[1;34m]\033[0m service provider for number : {service_provider}")
+			if TimeZone:
+				print(f"\033[1;34m[\033[1;36m+\033[1;34m]\033[0m Timezone for number : {TimeZone[0]}")
+		try:
+			from opencage.geocoder import OpenCageGeocode
+			key = "abcfabed23174112b3d7b6c93ed7a5b2"
+			loc = OpenCageGeocode(key)
+			flag = loc.geocode(location)[0]
+
+		except Exception as e:
+			print(f"\n\033[0;31m[ERROR] {e};")
+			print("[ERROR] geolocation with phonenumber terminated !\033[0m")
+		else:
+			pass
+	else:
+		pass
+	return flag
+
+def geolocatePhone(number):
+	print("\033[1;33m"+"="*23+"[Geolocate Phone Number]"+"="*23+"\033[0m")
 	try:
-		geo_locate = requests.get("http://ip-api.com/json/"+target_ip)
-		js = geo_locate.json()
+		value_flag = parsePhonedo(number)
+		if value_flag == 0:
+			print()
+	except Exception as e:
+		err = str(e)
+		error = err[3:]
+		print(f"\n\033[0;31m[ERROR] {error}\033[0m")
+	print("\n\033[1;33m"+"="*23+"="*24+"="*23+"\033[0m")
 
-		status = js['status']
-		country = js['country']
-		country_code = js['countryCode']
-		region = js['region']
-		regionName = js['regionName']
-		city = js['city']
-		latitude = js['lat']
-		longitude = js['lon']
-		isp = js['isp']
-		org = js['org']
-		postal_code_PIN_code = js['zip']
-
-		print('-'*72+'\n')
-		print("""
-------------------------------------------------------------------------
-###################################
-#      finding geolication        #
-###################################""")
-		print("[*] finding geolication with some usefull stuff about %s" % (target_ip))
-		time.sleep(.6)
-		print("|")
-		print("|COUNTRY      : %s" % country)
-		print("|COUNTRY_CODE : %s" % country_code)
-		print("|REGION_NAME  : %s" % regionName)
-		print("|REGION       : %s" % region)
-		print("|CITY         : %s" % city)
-		print("|LATITUDE TO LOCATION : %s" % latitude)
-		print("|LONGITUDE TO LOCATION : %s" % longitude)
-		print("|ISP of the device : %s" % isp)
-		print("|ORG of the device : %s" % org)
-		print("|PIN_CODE     : %s" % postal_code_PIN_code)
-		print("-"*72)
-
-	except:
-		print("[!] Exception exists. ")
-
-def tracert(target_ip):
-	print("""
------------------------------------------------------------------------
-###########################
-#       traceroute        #
-###########################""")
+def resolve_ip(target_ip):
 	try:
-		hops = traceroute(target_ip)
-		print('Distance/TTL\tAddress\tAverage round-trip time')
-
-		last_distance = 0
-
-		for hop in hops:
-			if last_distance +1 != hop.distance:
-				print("***********something is wrong***********")
-
-			print(f'{hop.distance}\t{hop.address}\t{hop.avg_rtt} ms')
-			last_distance = hop.distance
-
+		target = ''.join(target_ip.split())
+		if target.count('.') > 0:
+			ip = gethostbyname(target)
+		return ip
 	except:
-		print("[-] sorry, make sure you are root!")
+		return 0
 
-def os(target_ip):
-	print("""
------------------------------------------------------------------------
-#######################
-#    OS detection     #
-#######################""")
-	nm = nmap.PortScanner()
-	x = nm.scan(hosts=target_ip, arguments='-O')
+def geolocateIP(ip_addr):
+	try:
+		request = get(f"http://ip-api.com/json/{ip_addr}")
+		data = request.json()
+		return data
+	except Exception as e:
+		return e
 
-	scan_accuracy = nm[target_ip]['osmatch'][0]['accuracy']
-	os_type = nm[target_ip]['osmatch'][0]['osclass'][0]['type']
-	os_name = nm[target_ip]['osmatch'][0]['name']
-	os_vendor = nm[target_ip]['osmatch'][0]['osclass'][0]['vendor']
-	os_generation = nm[target_ip]['osmatch'][0]['osclass'][0]['osgen']
-	os_family = nm[target_ip]['osmatch'][0]['osclass'][0]['osfamily']
-
-	print('[+] found OS of the target with possible OS fingerprints')
-	print('|')
-	print('|OS type : %s' % (os_type))
-	print('|scan accuracy : %s' % (scan_accuracy))
-	print('|OS name : %s' % (os_name))
-	print('|OS vendor : %s' % (os_vendor))
-	print('|OS generation : %s' % (os_generation))
-	print('|OS family : %s' % (os_family))
-	print('-'*72+'\n')
-
-	time.sleep(.2)
-
-	print("""
------------------------------------------------------------------------
-##########################
-#      port scanning     #
-##########################""")
-	print("[*] scanning for open ports")
-	print("|")
-
-	all_protocols = x['scan'][target_ip].all_protocols()[0]
-
-	ports = list(x['scan'][target_ip][all_protocols])
-
-	for open_ports in ports:
-		port_status = x['scan'][target_ip][all_protocols][open_ports]['state']
-		port_name = x['scan'][target_ip][all_protocols][open_ports]['name']
-
-		print("PORT : %d         SERVICE : %s         STATUS : %s" % (open_ports,port_name,port_status))
-
-if len(sys.argv) == 2 or len(sys.argv) == 4:
-	target = sys.argv[1]
-	resolved_target = socket.gethostbyname(target)
-
-	system = platform.system()
-	version = platform.version()
-	os_version = version[1::]
-	processor = platform.processor()
-
-	print("[*] performing this task on %s %s with %s processor" % (system, os_version, processor))
-
-	geolocate_osint(resolved_target)
-	print(chr(0xa))
-	tracert(resolved_target)
-	print('-'*72)
-	print(chr(0xa))
-	os(resolved_target)
+def geolocateMainIP(public_ip):
+	try:
+		ip = resolve_ip(public_ip)
+		if not ip:
+			print("\n\033[0;31m[ERROR] can't resolve the given IPv4 address\033[0m\n")
+		else:
+			result = geolocateIP(ip)
+			if result[''] == 'success':
+				pass
+	except Exception as e:
+		raise e
