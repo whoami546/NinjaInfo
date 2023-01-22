@@ -55,7 +55,7 @@ if len(argv) == 1:
 	exit(0)
 
 print(figlet_format("NinjaInfo"))
-print("\t"*3 + "-by whoamiPwns\n")
+print("\t"*3 + "-by twitter:whoamiPwns, Github:@whoami546\n")
 
 def parsePhonedo(number):
 	flag = 0
@@ -91,12 +91,23 @@ def geolocatePhone(number):
 	print("\033[1;33m"+"="*23+"[Geolocate Phone Number]"+"="*23+"\033[0m")
 	try:
 		value_flag = parsePhonedo(number)
-		if value_flag == 0:
-			print()
+		if value_flag != 0:
+			geometery = value_flag.get("geometry")
+			annotations = value_flag.get("annotations")
+			if annotations != None:
+				mgrs = annotations.get("MGRS")
+				print(f"\033[1;34m[\033[1;36m+\033[1;34m]\033[0m MGRS : {mgrs}")
+
+			if geometery != None:
+				latitude = geometery.get("lat")
+				longitude = geometery.get("lng")
+				print(f"\033[1;34m[\033[1;36m+\033[1;34m]\033[0m latitude : {latitude}")
+				print(f"\033[1;34m[\033[1;36m+\033[1;34m]\033[0m longitude : {longitude}")
+
 	except Exception as e:
-		err = str(e)
-		error = err[3:]     # modify
-		print(f"\n\033[0;31m[ERROR] {error}\033[0m")
+		err = findall(r"^.{9}.{14}", str(e))
+		print(err)    # modify
+		print(f"\n\033[0;31m[ERROR] {err}\033[0m")
 	print("\n\033[1;33m"+"="*23+"="*24+"="*23+"\033[0m")
 
 def resolve_ip(target_ip):
@@ -127,6 +138,8 @@ def geolocateMainIP(public_ip):
 			if result['status'] == 'success':
 				for x in result:
 					print(f"\033[1;34m[\033[1;36m+\033[1;34m]\033[0m {x} : {result.get(x)}")
+			else:
+				print("\033[0;31m[ERROR] Expected a public IP..?!\033[0m")
 	except Exception as e:
 		raise e
 	print("\n\033[1;33m"+"="*23+"="*24+"="*23+"\033[0m")
