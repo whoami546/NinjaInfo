@@ -106,7 +106,6 @@ def geolocatePhone(number):
 
 	except Exception as e:
 		err = findall(r"^.{9}.{14}", str(e))
-		print(err)    # modify
 		print(f"\n\033[0;31m[ERROR] {err}\033[0m")
 	print("\n\033[1;33m"+"="*23+"="*24+"="*23+"\033[0m")
 
@@ -143,3 +142,10 @@ def geolocateMainIP(public_ip):
 	except Exception as e:
 		raise e
 	print("\n\033[1;33m"+"="*23+"="*24+"="*23+"\033[0m")
+
+def favICON(path):
+	try:
+		secure_path = findall(r"", path)
+	except:
+		pass
+
