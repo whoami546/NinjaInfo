@@ -4,6 +4,7 @@ from socket import gethostbyname
 from pyfiglet import figlet_format
 from sys import argv
 from hashlib import md5
+from re import findall
 import argparse
 
 parser = argparse.ArgumentParser(
@@ -77,7 +78,8 @@ def parsePhonedo(number):
 			flag = loc.geocode(location)[0]
 
 		except Exception as e:
-			print(f"\n\033[0;31m[ERROR] {e};")
+			pattern = findall(r"^.{9}.{14}", str(e))
+			print(f"\n\033[0;31m[ERROR] {pattern[0]}")
 			print("[ERROR] geolocation with phonenumber terminated !\033[0m")
 		else:
 			pass
@@ -93,7 +95,7 @@ def geolocatePhone(number):
 			print()
 	except Exception as e:
 		err = str(e)
-		error = err[3:]
+		error = err[3:]     # modify
 		print(f"\n\033[0;31m[ERROR] {error}\033[0m")
 	print("\n\033[1;33m"+"="*23+"="*24+"="*23+"\033[0m")
 
@@ -115,13 +117,16 @@ def geolocateIP(ip_addr):
 		return e
 
 def geolocateMainIP(public_ip):
+	print("\n\033[1;33m"+"="*23+"[Geolocate IPv4 address]"+"="*23+"\033[0m\n")
 	try:
 		ip = resolve_ip(public_ip)
 		if not ip:
-			print("\n\033[0;31m[ERROR] can't resolve the given IPv4 address\033[0m\n")
+			print("\033[0;31m[ERROR] can't resolve the given host to IPv4 address\033[0m\n")
 		else:
 			result = geolocateIP(ip)
-			if result[''] == 'success':
-				pass
+			if result['status'] == 'success':
+				for x in result:
+					print(f"\033[1;34m[\033[1;36m+\033[1;34m]\033[0m {x} : {result.get(x)}")
 	except Exception as e:
 		raise e
+	print("\n\033[1;33m"+"="*23+"="*24+"="*23+"\033[0m")
