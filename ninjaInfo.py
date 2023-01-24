@@ -416,6 +416,9 @@ def favICON(path_url):
 
 				if md5_sum in favicons:
 					print(f"{md5_sum} : {favicons.get(md5_sum)}")
+				else:
+					print("Can't found the favicon detail...")
+					
 			except Exception as e:
 				error_msg = str(e)
 				test = re.search(r"^HTTP.{8}.{7}", error_msg)
@@ -424,4 +427,4 @@ def favICON(path_url):
 		else:
 			print("\033[0;31m[ERROR] Valid URL/path expected...Exception existed!\033[0m")
 	except Exception as e:
-		print("\033[0;31m[ERROR] Connection timedout...\033[0m")
+		print("\033[0;31m[ERROR] %s \033[0m" % (e))
