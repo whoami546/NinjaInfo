@@ -402,13 +402,8 @@ def geolocateMainIP(public_ip):
 
 def favICON(path_url):
 	try:
-		regex = ("((http|https)://)(www.)?" +
-             "[a-zA-Z0-9@:%._\\+~#?&//=]" +
-             "{2,256}\\.[a-z]" +
-             "{2,6}\\b([-a-zA-Z0-9@:%" +
-             "._\\+~#?&//=]*)")
-		patter_url = re.compile(regex)
-		valid_path = re.search(patter_url, path_url)
+		valid_path = re.findall(r"(http:\//.*\S|https:\//.*\S)", path_url)
+		print(valid_path)
 		if valid_path:
 			try:
 				rjq = get(path_url)
@@ -418,7 +413,7 @@ def favICON(path_url):
 					print(f"{md5_sum} : {favicons.get(md5_sum)}")
 				else:
 					print("Can't found the favicon detail...")
-					
+
 			except Exception as e:
 				error_msg = str(e)
 				test = re.search(r"^HTTP.{8}.{7}", error_msg)
