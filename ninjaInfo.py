@@ -78,9 +78,13 @@ def parsePhonedo(number):
 			flag = loc.geocode(location)[0]
 
 		except Exception as e:
-			pattern = findall(r"^.{9}.{14}", str(e))
-			print(f"\n\033[0;31m[ERROR] {pattern[0]}")
-			print("[ERROR] geolocation with phonenumber terminated !\033[0m")
+			pattern = str(e)
+			test = findall(r"^HTTP.{8}.{7}", pattern)
+			test1 = findall(r"^list.{3}.\w{2}",pattern)
+			if test:
+				print(f"\n\033[0;31m[ERROR] Connection timedout with API....!!\033[0m")
+			elif test1:
+				print(f"\n\033[0;31m[ERROR] Not a valid phone number\033[0m")
 		else:
 			pass
 	else:
@@ -106,7 +110,7 @@ def geolocatePhone(number):
 
 	except Exception as e:
 		err = findall(r"^.{9}.{14}", str(e))
-		print(f"\n\033[0;31m[ERROR] {err}\033[0m")
+		print(f"\n\033[0;31m[ERROR] {err[0]}\033[0m")
 	print("\n\033[1;33m"+"="*23+"="*24+"="*23+"\033[0m")
 
 def resolve_ip(target_ip):
@@ -140,12 +144,6 @@ def geolocateMainIP(public_ip):
 			else:
 				print("\033[0;31m[ERROR] Expected a public IP..?!\033[0m")
 	except Exception as e:
-		raise e
+		print(f"\033[0;31m[ERROR] {e}\033[0m")
 	print("\n\033[1;33m"+"="*23+"="*24+"="*23+"\033[0m")
-
-def favICON(path):
-	try:
-		secure_path = findall(r"", path)
-	except:
-		pass
 
