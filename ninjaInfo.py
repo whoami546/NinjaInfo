@@ -333,9 +333,9 @@ def parsePhonedo(number):
 			test = re.search(r"^HTTP.{8}.{7}", pattern)
 			test1 = re.search(r"^list.{3}.\w{2}",pattern)
 			if test:
-				print(f"\n\033[0;31m[ERROR] Connection timedout with API....!!\033[0m")
+				print("\n\033[0;31m[ERROR] Connection timedout with API....!!\033[0m")
 			elif test1:
-				print(f"\n\033[0;31m[ERROR] Not a valid phone number\033[0m")
+				print("\n\033[0;31m[ERROR] Not a valid phone number\033[0m")
 		else:
 			pass
 	else:
@@ -392,8 +392,10 @@ def geolocateMainIP(public_ip):
 			if result['status'] == 'success':
 				for x in result:
 					print(f"\033[1;34m[\033[1;36m+\033[1;34m]\033[0m {x} : {result.get(x)}")
-			else:
+			elif result['status'] == 'fail':
 				print("\033[0;31m[ERROR] Expected a public IP..?!\033[0m")
+			else:
+				print("\033[0;31m[ERROR] Exception exists! error...\033[0m")
 	except Exception as e:
 		print(f"\033[0;31m[ERROR] {e}\033[0m")
 	print("\n\033[1;33m"+"="*23+"="*24+"="*23+"\033[0m")
@@ -406,7 +408,20 @@ def favICON(path_url):
              "{2,6}\\b([-a-zA-Z0-9@:%" +
              "._\\+~#?&//=]*)")
 		patter_url = re.compile(regex)
-		d = re.search(patter_url, path_url)
-		print(d)
-	except:
-		print(True)
+		valid_path = re.search(patter_url, path_url)
+		if valid_path:
+			try:
+				rjq = get(path_url)
+				md5_sum = md5(rjq.content).hexdigest()
+
+				if md5_sum in favicons:
+					print(f"{md5_sum} : {favicons.get(md5_sum)}")
+			except Exception as e:
+				error_msg = str(e)
+				test = re.search(r"^HTTP.{8}.{7}", error_msg)
+				if test:
+					print("\n\033[0;31m[ERROR] Connection timedout...\033[0m")
+		else:
+			print("\033[0;31m[ERROR] Valid URL/path expected...Exception existed!\033[0m")
+	except Exception as e:
+		print("\033[0;31m[ERROR] Connection timedout...\033[0m")
