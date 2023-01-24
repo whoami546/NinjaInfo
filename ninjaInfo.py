@@ -4,7 +4,7 @@ from socket import gethostbyname
 from pyfiglet import figlet_format
 from sys import argv
 from hashlib import md5
-import re
+from re import search
 import argparse
 
 parser = argparse.ArgumentParser(
@@ -330,8 +330,8 @@ def parsePhonedo(number):
 
 		except Exception as e:
 			pattern = str(e)
-			test = re.search(r"^HTTP.{8}.{7}", pattern)
-			test1 = re.search(r"^list.{3}.\w{2}",pattern)
+			test = search(r"^HTTP.{8}.{7}", pattern)
+			test1 = search(r"^list.{3}.\w{2}",pattern)
 			if test:
 				print("\n\033[0;31m[ERROR] Connection timedout with API....!!\033[0m")
 			elif test1:
@@ -401,25 +401,27 @@ def geolocateMainIP(public_ip):
 	print("\n\033[1;33m"+"="*23+"="*24+"="*23+"\033[0m")
 
 def favICON(path_url):
+	print("\n\033[1;33m"+"="*23+"[1nf0 fr0m FavICON]"+"="*23+"\033[0m\n")
 	try:
-		valid_path = re.findall(r"(http:\//.*\S|https:\//.*\S)", path_url)
-		print(valid_path)
+		valid_path = search(r"(http:\//.*\S|https:\//.*\S)", path_url)
 		if valid_path:
 			try:
 				rjq = get(path_url)
 				md5_sum = md5(rjq.content).hexdigest()
 
 				if md5_sum in favicons:
-					print(f"{md5_sum} : {favicons.get(md5_sum)}")
+					print(f"\033[1;34m[\033[1;36m+\033[1;34m]\033[0m md5sum : {md5_sum}")
+					print(f"\033[1;34m[\033[1;36m+\033[1;34m]\033[0m framework in use : {favicons.get(md5_sum)}")
 				else:
-					print("Can't found the favicon detail...")
+					print("\033[1;33m[\033[0m!\033[1;33m]\033[0m Can't found the favicon detail...")
 
 			except Exception as e:
 				error_msg = str(e)
-				test = re.search(r"^HTTP.{8}.{7}", error_msg)
+				test = search(r"^HTTP.{8}.{7}", error_msg)
 				if test:
 					print("\n\033[0;31m[ERROR] Connection timedout...\033[0m")
 		else:
 			print("\033[0;31m[ERROR] Valid URL/path expected...Exception existed!\033[0m")
 	except Exception as e:
 		print("\033[0;31m[ERROR] %s \033[0m" % (e))
+	print("\n\033[1;33m"+"="*23+"="*24+"="*23+"\033[0m")
