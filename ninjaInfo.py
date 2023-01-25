@@ -306,7 +306,7 @@ if len(argv) == 1:
 	exit(0)
 
 print(figlet_format("NinjaInfo"))
-print("\t"*3 + "-by twitter:whoamiPwns, Github:@whoami546\n")
+print("\t"*3 + "-by twitter:@whoamiPwns, Github:@whoami546\n")
 
 def parsePhonedo(number):
 	flag = 0
