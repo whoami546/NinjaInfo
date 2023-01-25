@@ -4,7 +4,7 @@ from socket import gethostbyname
 from pyfiglet import figlet_format
 from sys import argv
 from hashlib import md5
-from re import search
+from re import search,findall
 import argparse
 
 parser = argparse.ArgumentParser(
@@ -360,7 +360,7 @@ def geolocatePhone(number):
 				print(f"\033[1;34m[\033[1;36m+\033[1;34m]\033[0m longitude : {longitude}")
 
 	except Exception as e:
-		err = re.findall(r"^.{9}.{14}", str(e))
+		err = findall(r"^.{9}.{14}", str(e))
 		print(f"\n\033[0;31m[ERROR] {err[0]}\033[0m")
 	print("\n\033[1;33m"+"="*23+"="*24+"="*23+"\033[0m")
 
