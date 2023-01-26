@@ -4,7 +4,10 @@ from socket import gethostbyname
 from pyfiglet import figlet_format
 from sys import argv
 from hashlib import md5
+from collections import deque
 from re import search,findall
+from urllib.parse import urlsplit
+from bs4 import BeautifulSoup
 import argparse
 
 parser = argparse.ArgumentParser(
@@ -425,3 +428,73 @@ def favICON(path_url):
 	except Exception as e:
 		print("\033[0;31m[ERROR] %s \033[0m" % (e))
 	print("\n\033[1;33m"+"="*23+"="*24+"="*23+"\033[0m")
+
+def scrap_email(scrap_url):
+	print("\n\033[1;33m"+"="*23+"[Scrap E-mail fr0m URL]"+"="*23+"\033[0m\n")
+	target = search(r"(http:\//.*\S|https:\//.*\S)", scrap_url)
+	if target:
+		print("\033[1;34m[\033[1;36m+\033[1;34m]\033[0m crawling the given URL for emails...")
+		x_ = 1
+		undo_url = deque([scrap_url])
+		do_url = set()
+		emails = set()
+		while len(undo_url):
+			url = undo_url.popleft()
+			do_url.add(url)
+			parts = urlsplit(url)
+			base = "{0.scheme}://{0.netloc}".format(parts)
+
+			if '/' in parts.path:
+				path = url[:url.rfind('/')+1]
+			else:
+				path = url
+			try:
+				response_url2 = get(url)
+			except Exception as e:
+				pattern = str(e)
+				err1 = search(r"^HTTP.{8}.{7}", pattern)
+				#err2 = search(r"^list.{3}.\w{2}",pattern)
+				if err1:
+					print("\n\033[0;31m[ERROR] Host not found...!!\033[0m")
+				print("\n\033[1;33m"+"="*23+"="*24+"="*23+"\033[0m")
+				exit(2)
+
+			new_emails = set(findall(r"[a-z0-9\.\-+_]+@[a-z0-9\.\-+_]+\.*", response_url2.text))
+			emails.update(new_emails)
+			soup = BeautifulSoup(response_url2.text, 'lxml')
+
+			for anchor in soup.find_all("a"):
+				if "href" in anchor.attrs:
+					link = anchor.attrs["href"]
+				else:
+					link = ''
+					if link.startswith('/'):
+						link = base + link
+					elif not link.startswith('http'):
+						link = path + link
+					if not link.endswith('.gz'):
+						if not link in undo_url and not link in do_url:
+							undo_url.append(link)
+		if emails:
+			for i in emails:
+				print(f"\033[1;34m[\033[1;36m+\033[1;34m]\033[0m found email{x_} : {i}")
+	else:
+		print("\033[0;31m[ERROR] Valid URL/path expected...Exception existed!\033[0m")
+	print("\n\033[1;33m"+"="*23+"="*24+"="*23+"\033[0m")
+
+if __name__=="__main__":
+	if argument.ip_address:
+		for i in argument.ip_address:
+			geolocateMainIP(i)
+
+	if argument.phone_number:
+		for i in argument.phone_number:
+			geolocatePhone(i)
+
+	if argument.scrap_mail:
+		for i in argument.scrap_mail:
+			scrap_email(i)
+
+	if argument.favicon:
+		for i in argument.favicon:
+			favICON(i)
