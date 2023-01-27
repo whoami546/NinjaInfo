@@ -478,6 +478,7 @@ def scrap_email(scrap_url):
 		if emails:
 			for i in emails:
 				print(f"\033[1;34m[\033[1;36m+\033[1;34m]\033[0m found email{x_} : {i}")
+				x_ +=1
 	else:
 		print("\033[0;31m[ERROR] Valid URL/path expected...Exception existed!\033[0m")
 	print("\n\033[1;33m"+"="*23+"="*24+"="*23+"\033[0m")
