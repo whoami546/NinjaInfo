@@ -1,5 +1,5 @@
 # ninjaInfo.py - A simple tool
-
+![Screenshot at 2023-01-27 13-41-34](https://user-images.githubusercontent.com/84438424/215038791-c90c2aba-c2b8-4d04-b131-573ca99ff8eb.png)
 ## What is NinjaInfo ?
 NinjaInfo is basically an OSINT tool made to do geolocation with phone number or IP address and scrap e-mail IDs from the target URL as well, if given.
 It also has a feature to tell the known framework used by the website just by looking over its `favicon.ico` file.
